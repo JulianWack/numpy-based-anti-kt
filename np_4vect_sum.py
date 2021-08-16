@@ -1,4 +1,14 @@
 import numpy as np
+import mpmath
+
+mpmath.mp.dps = 100
+
+np_cos = np.frompyfunc(mpmath.cos, 1, 1)
+np_sin = np.frompyfunc(mpmath.sin, 1, 1)
+np_cosh = np.frompyfunc(mpmath.cosh, 1, 1)
+np_sinh = np.frompyfunc(mpmath.sinh, 1, 1)
+np_arctan2 = np.frompyfunc(mpmath.atan2, 2, 1)
+np_log = np.frompyfunc(mpmath.log, 1, 1)
 
 
 def CosTheta(x, y, z):
@@ -37,7 +47,7 @@ def get_phi(x, y):
     if (x==0) and (y==0):
         phi = 0
     else:
-        phi = np.arctan2(y,x)
+        phi = np_arctan2(y,x)
         
     return phi
 
@@ -61,12 +71,12 @@ def np_sum4vec(pt, eta, phi, mass):
     n_PF = len(pt)
     vec4 = np.ndarray((n_PF,4))
     
-    vec4[:,0] = pt*np.cos(phi)
-    vec4[:,1] = pt*np.sin(phi)
-    vec4[:,2] = pt*np.sinh(eta)
+    vec4[:,0] = pt*np_cos(phi)
+    vec4[:,1] = pt*np_sin(phi)
+    vec4[:,2] = pt*np_sinh(eta)
     
-    non_neg = np.sqrt(pt**2*np.cosh(eta)**2 + mass**2)
-    neg = np.sqrt(np.maximum(pt**2*np.cosh(eta)**2 - mass**2, 0))
+    non_neg = np.sqrt(pt**2*np_cosh(eta)**2 + mass**2)
+    neg = np.sqrt(np.maximum(pt**2*np_cosh(eta)**2 - mass**2, mpmath.mpf('0')))
     vec4[:,3] = np.where(mass>=0, non_neg, neg)
 
     vec4_summed = np.sum(vec4, axis=0)
